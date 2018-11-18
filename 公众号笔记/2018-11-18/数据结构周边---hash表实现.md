@@ -421,10 +421,45 @@ int Hash_Add(Hash* hash, HashKey* key, HashValue* value, Hash_Compare* compare)
 }
 ```
 
+##  删除键值对
 
+删除操作也容易理解，直接调用二叉排序树中的删除操作就可以了。代码如下：
 
+``` c
+// hash 表删除操作 
+HashValue* Hash_Remove(Hash* hash, HashKey* key, Hash_Compare* compare)
+{
+    HashValue* ret = NULL;
+    HashNode* node = (HashNode*)BSTree_Delete(hash, key, compare);
+    
+    if( node != NULL ) {
+        ret = node->value;
+        
+        free(node);
+    }
+    
+    return ret;
+}
+```
 
+## 根据键获取值
 
+这个函数也是服用二叉排序树中的函数，代码如下：
+
+``` c
+// 通过键值获取hash值 
+HashValue* Hash_Get(Hash* hash, HashKey* key, Hash_Compare* compare)
+{
+    HashValue* ret = NULL;
+    HashNode* node = (HashNode*)BSTree_Get(hash, key, compare);
+    
+    if( node != NULL ) {
+        ret = node->value;
+    }
+    
+    return ret;
+}
+```
 
 
 
