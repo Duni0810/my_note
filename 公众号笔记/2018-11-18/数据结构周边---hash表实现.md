@@ -273,7 +273,7 @@ static BSTreeNode* delete_node(BSTreeNode** pRoot)
 ```
 
 在删除操作中还有一种特殊的情况，我画个图，你们可能好理解，如下：
-
+![特殊情况](./images/二叉排序树特殊.png)
 
 
 
