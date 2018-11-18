@@ -365,14 +365,62 @@ static BSTreeNode* recursive_get(BSTreeNode* root, BSKey* key, BSTree_Compare* c
 
 为了提高效率，也为了让这篇文章有点联系，我们就利用之前写的二叉排序树来实现一套hash吧。
 
+内部结构信息如下：
+
+``` c
+// hash 内部管理结构体 
+struct _tag_HashNode
+{
+    BSTreeNode header;	// 链信息 
+    HashValue* value;		// 值保留 
+};
+```
+
+## 创建哈希
+这个简单呀，直接套用二叉排序树的初始化就好。如下：
+
+``` c
+// 创建hash表 
+Hash* Hash_Create()
+{
+    return BSTree_Create();
+}
+
+```
+
+## 加入键值对
+
+插入操作
 
 
+``` c
+    BSTree_Clear(hash);
+}
 
-
-
-
-
-
+// 加入键值对
+int Hash_Add(Hash* hash, HashKey* key, HashValue* value, Hash_Compare* compare)
+{
+    int ret = 0;
+    // 申请 数据存储空间 
+    HashNode* node = (HashNode*)malloc(sizeof(HashNode));
+    
+    if( ret = (node != NULL) ) {
+    	// 节点初始化赋值 
+        node->header.key = key;
+        node->value = value;
+        
+        // 调用二叉排序树中的插入操作 
+        ret = BSTree_Insert(hash, (BSTreeNode*)node, compare);
+        
+        // 如果插入失败，释放空间 
+        if( !ret ) {
+            free(node);
+        }
+    }
+    
+    return ret;
+}
+```
 
 
 
