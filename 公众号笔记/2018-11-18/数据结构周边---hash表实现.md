@@ -462,11 +462,41 @@ HashValue* Hash_Get(Hash* hash, HashKey* key, Hash_Compare* compare)
 ```
 
 
+## 获取键值对数目
+
+这个操作也比较简单呀，也是复用之前的二叉排序树中的函数，代码如下;
+``` c
+// hash表数据获取 
+int Hash_Count(Hash* hash)
+{
+    return BSTree_Count(hash);
+}
+```
+
+## 清空hash表
+
+我们在清空hash表的时候，必须递归的删除里面的数据，不然会造成内存泄露，代码如下：
+
+``` c
+// 清空hash 表 
+void Hash_Clear(Hash* hash)
+{
+    recursive_clear(BSTree_Root(hash));
+    BSTree_Clear(hash);
+}
+```
+递归代码如下：
+
+
+## 摧毁hash表
 
 
 
-
-
-
-
-
+``` c
+// 摧毁hash表 
+void Hash_Destroy(Hash* hash)
+{
+    Hash_Clear(hash);
+    BSTree_Destroy(hash);
+}
+```
