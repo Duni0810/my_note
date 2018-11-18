@@ -222,8 +222,57 @@ static BSTreeNode* recursive_delete(BSTreeNode** pRoot, BSKey* key, BSTree_Compa
 }
 ```
 
+删除操作的代码如下：
 
+``` c
+/**
+ * \brief 删除节点 
+ *
+ * \note 传入二级指主要是因为我们在删除操作需要需改指针数据 
+ */ 
+static BSTreeNode* delete_node(BSTreeNode** pRoot)
+{
+    BSTreeNode* ret = *pRoot;
+    
+    // 右节点为空时候，左节点直接上位 
+    if( (*pRoot)->right == NULL ) {
+        *pRoot = (*pRoot)->left;
+    
+    // 左节点为空时，右节点直接上位 
+    } else if( (*pRoot)->left == NULL ) {
+        *pRoot = (*pRoot)->right;
+    
+    // 如果做左右节点都不为空需要找中序遍历的直接前驱 
+    } else {
+        BSTreeNode* g = *pRoot;
+        BSTreeNode* c = (*pRoot)->left;
+        
+        // 右子树为空的节点  
+        while( c->right != NULL ) {
+            g = c;
+            c = c->right;
+        }
+        
+        //判断while是否有执行
+		//如果没有执行表示下一个节点直接满足条件 
+        if( g != *pRoot ) {
+            g->right = c->left;
+        } else {
+            g->left = c->left;
+        }
 
+		// 上位操作 
+        c->left = (*pRoot)->left;
+        c->right = (*pRoot)->right;
+        
+        *pRoot = c;
+    }
+    
+    return ret;
+}
+```
+
+在删除操作中还有一种特殊的情况，我画个图，你们可能好理解，如下：
 
 
 
