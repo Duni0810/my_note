@@ -487,10 +487,22 @@ void Hash_Clear(Hash* hash)
 ```
 递归代码如下：
 
+``` c
+// 递归清空hash 表防止内存泄露 
+void recursive_clear(BSTreeNode* node)
+{
+    if( node != NULL ) {
+        recursive_clear(node->left);
+        recursive_clear(node->right);
+        // 释放空间 
+        free(node);
+    }
+}
+```
 
 ## 摧毁hash表
 
-
+这个也简单，只需要调用清空hash函数，保证内存不会泄露，然后使用二叉排序树真的函数做摧毁就好。
 
 ``` c
 // 摧毁hash表 
@@ -500,3 +512,12 @@ void Hash_Destroy(Hash* hash)
     BSTree_Destroy(hash);
 }
 ```
+
+
+好了，关于数据结构的内容就说到这里吧，上面的hash表的实现比较粗糙，但是该有的功能都有，如果你们有兴趣可以自己完善一下实现。这篇笔记和代码和之前一样会放到网盘和git上，有兴趣的可以下载看看。**后台回复【2018-11-18】获取。**
+
+
+![CYoung](./images/二维码.jpg)
+
+
+
