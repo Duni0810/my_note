@@ -50,6 +50,22 @@ grammar_tableExtra: true
 
 这个好理解吧，因为二叉排序树也是二叉树，所以他的操作也和二叉树是一样一样的，我就不介绍了，可以看看之前的文章有具体的介绍，这里我就介绍他们不同的地方咯。
 因为二叉排序树是特殊的二叉树，所以大部分的操作是一样的，只有插入，删除和查找不一样，所以我就不重新写一个二叉树了，就那拿之前实现的代码来改改就好。
+
+## 结构变化
+
+因为是特殊的二叉树，所以结构肯定有所变化。
+
+``` c
+typedef struct _tag_BSTreeNode BSTreeNode;
+
+struct _tag_BSTreeNode
+{
+    BSKey* key;				// 查找关键字 
+    BSTreeNode* left;	  	// 左子树 
+    BSTreeNode* right;		// 右子树 
+};
+```
+
 ## 二叉排序树的添加
 
 
