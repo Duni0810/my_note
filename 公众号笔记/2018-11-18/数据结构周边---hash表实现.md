@@ -157,11 +157,41 @@ static int recursive_insert(BSTreeNode* root, BSTreeNode* node, BSTree_Compare* 
 考虑下，我们有必要重新执行一次中序遍历吗？ 显然没什么必要，我们只需要找到左节点的非空右节点作为替代就行。我画一个图，这样好理解点，如下：
 
 
+![例子](./images/二叉排序树例子.png)
 
+例如上图，我进行中序遍历，那他排序应该如下：
 
+``` markdown
+6, 12, 18, 25, 37, 50, 75
+```
+如果我要删除25，这个节点，按照要求我应该拿他的直接前驱替代，就是18。所以看代码的实现咯。
 
+``` c
+//brief 二叉树的删除 
+BSTreeNode* BSTree_Delete(BSTree* tree, BSKey* key, BSTree_Compare* compare)
+{
+    TBSTree* btree = (TBSTree*)tree;
+    BSTreeNode* ret = NULL; 
+    
+    if((btree != NULL) && (key != NULL) && (compare != NULL)) {
+        ret = recursive_delete(&btree->root, key, compare);
+        
+        // 如果删除成功 count-- 
+        if( ret != NULL )
+        {
+            btree->count--;
+        }
+    }
+    
+    return ret;
+}
+```
 
+递归代码如下：
 
+``` c
+
+```
 
 
 
