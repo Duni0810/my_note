@@ -46,7 +46,7 @@ grammar_tableExtra: true
 
 ![二叉排序树](./images/二叉排序树.png)
 
-
+有没有发现，二分查找的过程实际上就是一棵二叉树
 
 
 
