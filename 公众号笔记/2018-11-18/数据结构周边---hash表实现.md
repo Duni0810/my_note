@@ -154,7 +154,7 @@ static int recursive_insert(BSTreeNode* root, BSTreeNode* node, BSTree_Compare* 
 ## 二叉排序树的删除
 
 关于二叉排序树的删除会比较麻烦，应该我们删除了二叉树中的节点是必须保证二叉排序性的。如果我们删除的是叶结点，直接删除即可；如果是非叶结点，就得查找合适的替代者后删除，删除一个节点还得找到他的中序遍历的前驱节点作为替代。
-考虑下，我们有必要重新执行一次中序遍历吗？ 显然没什么必要，我们只需要找到左节点的非空右节点作为替代就行。我画一个图，这样好理解点，如下：
+考虑下，我们有必要重新执行一次中序遍历吗？ 显然没什么必要，我们只需要找到要删除节点的左节点，然后一直找到空右节点为止。我画一个图，这样好理解点，如下：
 
 
 ![例子](./images/二叉排序树例子.png)
@@ -273,30 +273,77 @@ static BSTreeNode* delete_node(BSTreeNode** pRoot)
 ```
 
 在删除操作中还有一种特殊的情况，我画个图，你们可能好理解，如下：
+
 ![特殊情况](./images/二叉排序树特殊.png)
 
+在上图中，如果我们删除的节点是25，是加上12直接上位就可以了。所以在上面的代码中，做一个特殊处理就行：
+
+``` c
+        //判断while是否有执行
+		//如果没有执行表示下一个节点直接满足条件 
+        if( g != *pRoot ) {
+            g->right = c->left;
+        } else {
+            g->left = c->left;
+        }
+```
+
+## 二叉排序树中的查找节点
+
+这个操作话就比较简单了，和之前的二叉树的查找有点类似。看代码就明白了，如下：
+
+``` c
+// 节点获取 
+BSTreeNode* BSTree_Get(BSTree* tree, BSKey* key, BSTree_Compare* compare)
+{
+    TBSTree* btree = (TBSTree*)tree;
+    BSTreeNode* ret = NULL; 
+    
+    if((btree != NULL) && (key != NULL) && (compare != NULL)) {
+        ret = recursive_get(btree->root, key, compare);
+    }
+    
+    return ret;
+}
+```
+
+递归代码如下：
+
+``` c
+/**
+ * \brief 递归查找
+ *
+ * param[in] root    查找节点
+ * patam[in] key     查找的关键字
+ * param[in] compare 比较函数 
+ */ 
+static BSTreeNode* recursive_get(BSTreeNode* root, BSKey* key, BSTree_Compare* compare)
+{
+    BSTreeNode* ret = NULL;
+    
+    if( root != NULL ) {
+        int r = compare(key, root->key);
+        
+        // 如果 r = 0 表示找到 
+        if( r == 0 ) {
+            ret = root;
+        
+        // 左节点 递归查找 
+        } else if( r < 0 ) {
+            ret = recursive_get(root->left, key, compare);
+        // 右节点 递归查找 
+        } else if( r > 0 ) {
+            ret = recursive_get(root->right, key, compare);
+        }
+    }
+    return ret;
+}
+```
+
+这个简单点，没啥好说明的了。
 
 
+----------
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+好了，上面的是二叉排序树的全部实现了，如果想要全部代码和测试工程，可以在后台回复【2018-11-18】获取咯。
 
