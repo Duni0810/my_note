@@ -77,9 +77,84 @@ typedef int (BSTree_Compare)(BSKey*, BSKey*);	// 比较函数
 
 ## 二叉排序树的添加
 
+我们插入是有一个条件的，在二叉排序树中，插入操作总是在叶结点处进行，必须遵守这条规则。
+再者，因为二叉排序树实际上就是二分法，所以判断也简单，就是我们插入的节点值和二叉树的节点值比较，小于走右边，大于走左边。这么说的话，肯定得用递归实现了呗。代码如下：
 
+``` c
+int BSTree_Insert(BSTree* tree, BSTreeNode* node, BSTree_Compare* compare) 
+{
+    TBSTree* btree = (TBSTree*)tree;
+    int ret = (btree != NULL) && 
+		    (node != NULL) &&
+			(compare != NULL);
+    
+    if(ret) {
+    	// 插入节点赋值 
+        node->left = NULL;
+        node->right = NULL;
+        
+        // 根节点 
+        if(btree->root == NULL) {
+            btree->root = node;
+        } else {
+            ret = recursive_insert(btree->root, node, compare);
+        }
+        
+        // 插入成功 count++ 
+        if(ret) {
+            btree->count++;
+        }
+    }
+    
+    return ret;
+}
+```
 
+递归代码如下：
 
+``` c
+/**
+ *  \brief 二叉排序树的插入操作
+ *
+ * param[in] root    节点信息
+ * param[in] node    插入的节点
+ * param[in] compare 比较函数
+ *
+ * \note 比较函数是用户传入的，我们不知数据类型，所以由用户自行处理 
+ */  
+static int recursive_insert(BSTreeNode* root, BSTreeNode* node, BSTree_Compare* compare)
+{
+    int ret = 1;
+    int r = compare(node->key, root->key);
+    
+    // 如果ｒ = 0  表示在二叉树中已经存在该节点, 插入失败 
+    if( r == 0 ) {
+        ret = 0;
+        
+    } else if( r < 0 ) { // 选择左子树中递归 
+		// 如果左子树不为空 ,递归 
+        if( root->left != NULL ) {
+            ret = recursive_insert(root->left, node, compare);
+        } else {	// 左子树为空，表示就插入在这个位置了。 
+            root->left = node;
+        }
+        
+    } else if( r > 0 ) { // 右子树递归 
+    	// 如果右子树不为空 ,递归 
+        if( root->right != NULL ) {
+            ret = recursive_insert(root->right, node, compare);
+        } else { // 右子树为空，表示就插入在这个位置了。
+            root->right = node;
+        }
+    }
+}
+```
+我简单的介绍下递归的代码。之前说了，我们的插入操作应该添加都在叶节点进行。==**还有一点，二叉排序树的实现有一个缺陷，就是不允许有两个完全相同的数据节点。**== 所以我们操作的时候，发现如果节点相同，直接返回失败，然后只要递归的找到合适的节点插入就可以了。
+
+## 二叉排序树的删除
+
+关于二叉排序树的删除会比较麻烦，应该我们删除了二叉树中的节点是必须保证二叉排序性的。如果我们删除的是叶结点，直接删除即可；如果是非叶结点，就得查找合适的替代者后删除，删除一个节点还得找到他的中序遍历的前驱节点作为替代。
+考虑下，我们有必要重新执行一次中序遍历吗？ 显然没什么必要，我们只需要找到左节点的非空右节点作为替代就行。我画一个图，这样好理解点，如下：
 
 
 
