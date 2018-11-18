@@ -73,6 +73,7 @@ typedef void (BSTree_Printf)(BSTreeNode*);		// 打印函数
 typedef int (BSTree_Compare)(BSKey*, BSKey*);	// 比较函数 
 ```
 
+有一点我们要注意的是，因为我们实现的是二叉排序树，就是一个有序的二叉树，所以二叉排序树的所有操作都必须保证其二叉排序性不变！
 ## 二叉排序树的添加
 
 
