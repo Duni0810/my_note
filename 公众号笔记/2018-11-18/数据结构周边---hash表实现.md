@@ -187,10 +187,39 @@ BSTreeNode* BSTree_Delete(BSTree* tree, BSKey* key, BSTree_Compare* compare)
 }
 ```
 
-递归代码如下：
+递归查找代码如下：
 
 ``` c
-
+/**
+ * \brief 递归删除 
+ *
+ * param[in] pRoot     删除节点起始位置
+ * param[in] key       关键字
+ * param[in] compare   比较函数 
+ *
+ * retval 返回待删除的元素 
+ */ 
+static BSTreeNode* recursive_delete(BSTreeNode** pRoot, BSKey* key, BSTree_Compare* compare)
+{
+    BSTreeNode* ret = NULL;
+    
+    if( (pRoot != NULL) && (*pRoot != NULL) ) {
+        int r = compare(key, (*pRoot)->key);
+        
+        // 找到元素 
+        if( r == 0 ) {
+            ret = delete_node(pRoot);
+        // 左子树递归查找 
+        } else if( r < 0 ) {
+            ret = recursive_delete(&((*pRoot)->left), key, compare);
+        // 右子树递归查找 
+        } else if( r > 0 ) {
+            ret = recursive_delete(&((*pRoot)->right), key, compare);
+        }
+    }
+    
+    return ret;
+}
 ```
 
 
