@@ -105,13 +105,13 @@ OSPrioHighRdy = OSNextTaskPrio; \
 ``` c
 void OSTimeDly(INT32U ticks)
 {
-	if( ticks > 0 ) 											/* 当延时有效 */
+	if( ticks > 0 ) 		/* 当延时有效 */
 	{
-		OS_ENTER_CRITICAL();					/* 进入临界区 */
-		OSDelPrioRdy(OSPrioCur);				 /* 把当前任务从就绪表中删去 */
-		TCB[OSPrioCur].OSTCBDly = ticks;    /* 设置任务延时节拍数 */
-		OS_EXIT_CRITICAL();							/* 推出临界区 */
-		OSSched();											 /* 重新调度 */
+		OS_ENTER_CRITICAL();			/* 进入临界区 */
+		OSDelPrioRdy(OSPrioCur);  /* 把当前任务从就绪表中删去 */
+		TCB[OSPrioCur].OSTCBDly = ticks;  /* 设置任务延时节拍数 */
+		OS_EXIT_CRITICAL();		   	 /* 推出临界区 */
+		OSSched();						 /* 重新调度 */
 	}
 }
 ```
