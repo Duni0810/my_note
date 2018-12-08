@@ -78,14 +78,25 @@ unsigned int os_ready_tab; //就绪列表
 /**************定义任务优先级*************/
 #define		 PrioTask0 		0
 #define		 PrioTask1 		1
-#define	 	PrioTask2 		2
-#define 	PrioTask3 		3
+#define	 	 PrioTask2 		2
+#define    	 PrioTask3 		3
 ```
 
 这中还有一个概念：**抢占式调度**，一旦就绪状态中出现优先权更高的任务，便立即剥夺当前任务的运行权，把 CPU 分配给更高优先级的任务。这样 CPU 总是执行处于就绪条件下优先级最高的任务。
 
+要实现运行高优先级任务，我们得知道那个优先级的任务比较高，所以就得找到任务优先级高的任务，代码可以如下：
 
-
+``` c
+/* 在就绪表中查找更高级的就绪任务 */
+#define OSGetHighRdy() \
+{										 \
+for(OSNextTaskPrio = 0; \
+     (OSNextTaskPrio < OS_TASKS) && (!(OSRdyTbl & (0x01<<OSNextTaskPrio))); \
+      OSNextTaskPrio ++ ); 		\
+OSPrioHighRdy = OSNextTaskPrio; \
+}
+```
+代码中判断优先级从高到低查找，找到数据中某位数据位为1为止，这就表示找到优先级高的任务了，直接返回或者赋值给变量。代码中这样写不是特别的好，原因有二。其一：这个函数是不可重入的函数；其二，实时操作系统
 
 
 
