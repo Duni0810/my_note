@@ -60,12 +60,12 @@ unsigned int os_ready_tab; //就绪列表
 ``` c
 /* 在就绪表中登记就绪任务 */
 #define OSSetPrioRdy(prio) \
-{											 \
+{			         	  \
 	OSRdyTbl |= 0x01<<prio; \
 }
 /* 从就绪表中删除任务 */
-#define OSDelPrioRdy(prio) 		\
-{ 													\
+#define OSDelPrioRdy(prio) \
+{ 							\
 	OSRdyTbl &= ~(0x01<<prio); \
 }
 ```
