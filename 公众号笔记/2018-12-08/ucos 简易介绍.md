@@ -322,8 +322,30 @@ OS_EXIT_CRITICAL();
 
 任务调度的汇编函数示例如下：
 
+``` c
+OS_TASK_SW ; 任务级的任务切换
 
+stmfd sp!,{lr}		  ; PC入栈
+stmfd sp!,{r0-r12,lr} ; r0-r12，lr 入栈
 
+PUAH_PSR
+mrs r4,cpsr
+stmfd sp!,{r4} ; cpsr 入栈
+
+SaveSPToCurTcb 	; 保存当前任务的堆顶指针到它的 TCB.
+ldr r4,=p_OSTCBCur ; 取出当前任务的 PCB 地址
+ldr r5,[r4]
+str sp,[r5] 		; 保存当前任务的堆顶指针到它的 TCB(因为
+			 ;TaskCtrBlock 地址亦即 OSTCBStkPtr 的地址)
+
+GetHigTcbSP				; 取出更高优先级任务的堆顶指针到 SP ,
+ldr r6,=p_OSTCBHighRdy ; 取出更高优先级就绪任务的 PCB 的地址
+ldr r6,[r6]
+ldr sp,[r6] 			; 取出更高优先级任务的堆顶指针到 SP
+b POP_ALL 				; 恢复待运行任务的运行环境
+```
+
+上面的代码看不同没关系，我们只需要知道的他是怎么实现任务切换的的就可以了，毕竟我们并不是写操作系统的，任务切换流程图如下：
 
 
 
