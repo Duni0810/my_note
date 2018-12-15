@@ -196,7 +196,7 @@ void start_task(void *pdata)
 
 ## 任务控制块
 
-什么是任务控制块呢？简单的说就是系统记录任务执行的环境，在ucos中任务控制块内容贼鸡儿长，当前任务栈位置，任务栈大小，任务状态等等。
+什么是任务控制块呢？简单的说就是系统记录任务执行的环境，在ucos中任务控制块内容贼鸡儿长，长到什么地步呢？结构体有60多行，内容包括当前任务栈位置，任务栈大小，任务状态等等。
 
 ``` c
 typedef struct os_tcb {
@@ -297,8 +297,7 @@ p_OSTCBCur = &TCB[OSPrioCur]; /* 目的是在汇编中引用任务的 TCB 地址
 SaveSPToCurTcb 
 ldr r4,=p_OSTCBCur ; 取出当前任务的 PCB 地址
 ldr r5,[r4]
-str sp,[r5] ; 保存当前任务的堆顶指针到它的TCB(因为 TaskCtrBlock 地址亦即
-                ; OSTCBStkPtr 的地址)
+str sp,[r5] ; 保存当前任务的堆顶指针到它的TCB
 ```
 
 任务切换时，把当前任务的现场数据保存在自己的任务栈里面，再把待运行的任务的数据从自己的任务栈装载到 CPU 中，改变 CPU 的 PC，SP，寄存器等。可以说，任务的切换是任务运行环境的切换。而任务的运行环境保存在任务栈中，也就是说，任务切换的关键是把任务的私有堆栈指针赋予处理器的堆栈指针 SP。部分代码示例如下：
@@ -307,14 +306,14 @@ str sp,[r5] ; 保存当前任务的堆顶指针到它的TCB(因为 TaskCtrBlock 
 // 任务调度函数
 void OSSched (void)
 {
-OS_ENTER_CRITICAL(); // 进入临界区
-OSGetHighRdy(); // 找出就绪表中优先级最高的任务 
+OS_ENTER_CRITICAL();			// 进入临界区
+OSGetHighRdy();					// 找出就绪表中优先级最高的任务 
 if(OSPrioHighRdy != OSPrioCur) // 如果不是当前运行的任务，进行任务调度 
 {
-p_OSTCBCur = &TCB[OSPrioCur]; // 压栈，保持当前任务的堆栈
+p_OSTCBCur = &TCB[OSPrioCur];	// 压栈，保持当前任务的堆栈
 p_OSTCBHighRdy = &TCB[OSPrioHighRdy];
-OSPrioCur = OSPrioHighRdy; // 给SP指针赋值 
-OS_TASK_SW(); // 任务调度函数 
+OSPrioCur = OSPrioHighRdy;		// 给SP指针赋值 
+OS_TASK_SW();					// 任务调度函数 
 }
 OS_EXIT_CRITICAL();
 }
