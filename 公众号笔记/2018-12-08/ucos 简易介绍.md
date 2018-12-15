@@ -145,6 +145,154 @@ void TickInterrupt(void)
 
 # 任务的切换
 
+在我们嵌入式领域中，一般只有颗CPU，但是我们要实现多任务，这就要求我们有自己的堆栈，程序代码，数据存储区等，这一系列就是决定一个任务独立的最基本的条件。这个多说句，咱们人也是一样的，人要独立也得有自己的私有财产，让我们自己自由分配，不让怎么算的上最基本的独立呢？
+## 可重入与不可重入函数
+在多任务中还有一个问题，就是可重入函数与不可重入函数的概念。那什么是可重入函数，什么又是不可重入函数呢？举个例子，一个低优先级的任务正在运行，他在操作一个全局变量，可能已经改变它的数值，正想使用这个变量的时候，另一个高优先级的任务正好打断他们，也使用这个函数，改变了这个全局变量。
+所以一般情况下可重入函数使用的数据为局部变量，不带静态局部变量的那种。还有一种如果有malloc和free的也不是可重入函数。这里有点比较重要的是，全局变量是系统各个任务共享的，所以在似乎用多任务操作系统中尽量不要使用全局变量。
+如果两个任务共用一套数据，破坏原先的数据结构，这时候我们就引入两种方法解决：可重入函数的设计和互斥调用。互斥调用就是之前说的临界区。
+
+## 临界区
+临界区函数要求是互斥的，意思是说一次仅允许一个任务使用公共资源，中断也不可以影响，这个是为了保障数据的可靠性和完整性，我们之前使用的临界区是关中断的方式，其实还有一些，例如：使用互斥信号量，关任务调度等等。
+
+``` c
+OS_ENTER_CRITICAL()；
+......；//临界代码
+OS_EXIT_CRITICAL();
+```
+
+这里要注意的地方是，在临界区的代码必须成对的出现，否则会出现不可预测的问题。我们使用临界区的时候，临界区的代码尽量短，因为一直在临界区中，别的任务是无法有使用CPU的机会的，这样会影响多任务系统的使用性能。
+
+## 任务栈
+
+大伙也知道，我们在创建任务的时候，除了会传入任务优先级，还会传入一个任务栈，这个任务栈其实就是一个全局变量的静态数组。为啥用数组呢？主要他是地址是线性的，我们在使用的时候，如果这个栈是递增栈，只需要将栈顶指针SP指向数组首元素；如果是递减栈，SP指针指向最后一个元素，这样就实现了一个任务的私有栈了。
+
+``` c
+//LED0任务
+//设置任务优先级
+#define LED0_TASK_PRIO       			7 
+//设置任务堆栈大小
+#define LED0_STK_SIZE  		    		64
+//任务堆栈	
+OS_STK LED0_TASK_STK[LED0_STK_SIZE];
+//任务函数
+void led0_task(void *pdata);
+
+//开始任务
+void start_task(void *pdata)
+{
+    OS_CPU_SR cpu_sr=0;
+	pdata = pdata; 
+  	OS_ENTER_CRITICAL(); //进入临界区(无法被中断打断)    
+ 	OSTaskCreate(led0_task,(void *)0,(OS_STK*)&LED0_TASK_STK[LED0_STK_SIZE-1],LED0_TASK_PRIO);						   
+ 	OSTaskCreate(led1_task,(void *)0,(OS_STK*)&LED1_TASK_STK[LED1_STK_SIZE-1],LED1_TASK_PRIO);	 				   
+	OSTaskSuspend(START_TASK_PRIO);	//挂起起始任务.
+	OS_EXIT_CRITICAL();	//退出临界区(可以被中断打断)
+}
+```
+
+要注意的是，我们传入的栈看情况设定，避免导致任务的栈溢出，出现不可预测的问题，甚至可能出现系统奔溃的问题。
+
+到目前为止，我们只解决了一个任务栈的问题，但是还没有说明如何进行任务的切换调度的问题。我们要实现任务的切换，还有一个条件就是要知道各个任务的栈顶指针的变量。说白了就是要保存它，这里就引入一个任务控制块的概念。
+
+## 任务控制块
+
+什么是任务控制块呢？简单的说就是系统记录任务执行的环境，在ucos中任务控制块内容贼鸡儿长，当前任务栈位置，任务栈大小，任务状态等等。
+
+``` c
+typedef struct os_tcb {
+    OS_STK          *OSTCBStkPtr;           
+
+#if OS_TASK_CREATE_EXT_EN > 0u
+    void            *OSTCBExtPtr;           
+    OS_STK          *OSTCBStkBottom;        
+    INT32U           OSTCBStkSize;          
+    INT16U           OSTCBOpt;              
+    INT16U           OSTCBId;               
+#endif
+
+    struct os_tcb   *OSTCBNext;             
+    struct os_tcb   *OSTCBPrev;             
+
+#if (OS_EVENT_EN)
+    OS_EVENT        *OSTCBEventPtr;         
+#endif
+
+#if (OS_EVENT_EN) && (OS_EVENT_MULTI_EN > 0u)
+    OS_EVENT       **OSTCBEventMultiPtr;    
+#endif
+
+#if ((OS_Q_EN > 0u) && (OS_MAX_QS > 0u)) || (OS_MBOX_EN > 0u)
+    void            *OSTCBMsg;               
+#endif
+
+#if (OS_FLAG_EN > 0u) && (OS_MAX_FLAGS > 0u)
+#if OS_TASK_DEL_EN > 0u
+    OS_FLAG_NODE    *OSTCBFlagNode;     
+#endif
+    OS_FLAGS         OSTCBFlagsRdy;     
+#endif
+
+    INT32U           OSTCBDly;          
+    INT8U            OSTCBStat;         
+    INT8U            OSTCBStatPend;     
+    INT8U            OSTCBPrio;         
+
+    INT8U            OSTCBX;            
+    INT8U            OSTCBY;            
+    OS_PRIO          OSTCBBitX;         
+    OS_PRIO          OSTCBBitY;         
+
+#if OS_TASK_DEL_EN > 0u
+    INT8U            OSTCBDelReq;       
+#endif
+
+#if OS_TASK_PROFILE_EN > 0u
+    INT32U           OSTCBCtxSwCtr;        
+    INT32U           OSTCBCyclesTot;       
+    INT32U           OSTCBCyclesStart;     
+    OS_STK          *OSTCBStkBase;         
+    INT32U           OSTCBStkUsed;         
+#endif
+
+#if OS_TASK_NAME_EN > 0u
+    INT8U           *OSTCBTaskName;
+#endif
+
+#if OS_TASK_REG_TBL_SIZE > 0u
+    INT32U           OSTCBRegTbl[OS_TASK_REG_TBL_SIZE];
+#endif
+} OS_TCB;
+```
+
+是不是特别的长，这里列出两个简单的务控制块，只包含了任务的堆栈指针和任务延时节拍数。
+
+``` c
+struct TaskCtrBlock /* 任务控制块数据结构 */
+{
+	INT32U OSTCBStkPtr; /* 保存任务的堆栈顶 */
+	INT32U OSTCBDly; /* 任务延时时钟 */
+};
+struct TaskCtrBlock TCB[OS_TASKS + 1]; /* 定义任务控制块 */
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
