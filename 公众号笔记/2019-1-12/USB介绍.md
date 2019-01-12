@@ -65,9 +65,28 @@ USB控制器类型贼多，什么OHCI，UHCI,EHCI啥的，我们这次只讲USB 
 
 一般情况下哦， USB1.x/USB2.0使用的是4线制,而USB3.0使用9线，别慌，他们是通用的,他们引脚对应的含义一般如下 ：
 
+表1 USB 1.x/2.0 定义
+| 引脚 | 名称 | 颜色  | 描述   |
+| ---- | ---- | ----- | ------ |
+| 1    | VBUS | Red   | 电源   |
+| 2    | D-   | White | 数据线 |
+| 3    | D+   | Green | 数据线 |
+| 4    | GND  | Black | 地     |
 
 
-
+表2 USB 3.0
+| 引脚  | 颜色   | type A | type B |
+| ----- | ------ | ------ | ------ |
+| 1     | red    |     VBUS   |
+| 2     | white  | D-     |
+| 3     | green  | D+         |
+| 4     | black  | GND     GND    |
+| 5     | blue   | SSRX-  | SSTX-  |
+| 6     | yellow | SSRX+  | SSTX+  |
+| 7     | shield | GND        |
+| 8     | purple | SSTX-  | SSRX-  |
+| 9     | orange | SSTX+  | SSRX+  |
+| shell | shell  | shield |
 
 
 
