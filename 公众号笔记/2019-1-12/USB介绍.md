@@ -88,7 +88,7 @@ USB控制器类型贼多，什么OHCI，UHCI,EHCI啥的，我们这次只讲USB 
 | 9     | orange | SSTX+  | SSRX+  |
 | shell | shell  | shield |
 
-以上上USB引脚定义,接下来介绍USB接口长什么样子的。
+以上USB引脚定义,接下来介绍USB接口长什么样子的。关于什么是USB公头什么是母头我就不解释了，应该都懂，
 
 
 
