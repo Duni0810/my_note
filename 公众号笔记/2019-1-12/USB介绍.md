@@ -108,5 +108,5 @@ USB控制器类型贼多，什么OHCI，UHCI,EHCI啥的，我们这次只讲USB 
 
 # USB 协议基础
 
-介绍完USB硬件基础，
+介绍完USB硬件基础，下面介绍USB协议基础，如果想详细了解USB协议的动易可以去USB官网看(https://www.usb.org/)，里面啥都有。
 
