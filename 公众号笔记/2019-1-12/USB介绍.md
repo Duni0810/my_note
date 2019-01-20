@@ -207,6 +207,8 @@ NRZI 编码（Non-Return-to-Zero Inverted Code）和 NRZ 的区别就是 NRZI �
  * 可选择的数据过程（可选，第一个包必须是DATA1，然后是DATA0,类推）；
  * 状态过程（应答，或者无应答）
 
+目前位置我们只需要知道，这个控制传输用在USB设备枚举过程。
+
 
 
 
