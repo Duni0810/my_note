@@ -410,4 +410,29 @@ static uint8_t __g_usbd_printer_desc_conf[32] = {
 
 这里给各给一个例子：
 
+``` c
+// 语言ID描述符（简体中文）
+static const uint8_t __g_usbd_printer_language[4] = {
+	sizeof(__g_usbd_printer_language),
+	0x03,
+	0x04,
+	0x08,
+}
+
+// 描述产品的字符串描述符
+static const uint8_t __g_usbd_printer_iproduct[18] = {
+	sizeof(__g_usbd_printer_iproduct),
+	0x03,
+	0x55,0x00, // ’U‘
+	0x42,0x00, // 'S'
+	0x53,0x00, // 'B'
+	0x21,0x6a, // 模
+	0xdf,0x62, // ’拟‘
+	0x53,0x62, // ’打‘
+	0x70,0x62, // ’印‘
+	0x73, 0x67, // ’机‘
+}
+
+```
+
 
