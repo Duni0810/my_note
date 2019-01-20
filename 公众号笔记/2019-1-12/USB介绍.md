@@ -435,4 +435,4 @@ static const uint8_t __g_usbd_printer_iproduct[18] = {
 
 ```
 
-
+之后还有其他的字符串描述符，可以自己添加。我就不一一赘述了。
